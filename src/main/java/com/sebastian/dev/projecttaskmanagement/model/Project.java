@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.UUID;
 
+import com.sebastian.dev.projecttaskmanagement.exception.notfound.TaskNotFoundException;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -24,14 +26,38 @@ public class Project {
         this.name = name;
     }
 
-    public void addTask(Task task) {
+    private Project(UUID id, String name, Set<Task> tasks) {
+        this.id = id;
+        this.name = name;
+        for (Task t : tasks) {
+            addTask(t);
+        }
+    }
+
+    public static Project reconstituteProject(UUID id, String name, Set<Task> tasks) {
+        return new Project(id, name, tasks);
+    }
+
+    public boolean addTask(Task task) {
         checkNullity(task);
-        tasks.add(task);
+        return tasks.add(task);
     }
 
     public void deleteTask(Task task) {
         checkNullity(task);
         tasks.remove(task);
+    }
+
+    public Set<Task> findAllTasks() {
+        return Collections.unmodifiableSet(tasks); // safe copying.
+    }
+
+    public Task findTask(UUID taskId) {
+        return this.tasks
+                .stream()
+                .filter(t -> t.getId().equals(taskId))
+                .findFirst()
+                .orElseThrow(() -> new TaskNotFoundException(String.format("The task with id %s not found", taskId)));
     }
 
     public void updateProjectName(String name) { // can update tasks by deleting and adding.
@@ -40,10 +66,6 @@ public class Project {
             throw new IllegalArgumentException("The name " + name + " has already been assigned");
         }
         this.name = name;
-    }
-
-    public Set<Task> findTasks() {
-        return Collections.unmodifiableSet(tasks); // safe copying.
     }
 
     private void checkNullity(Object o) {

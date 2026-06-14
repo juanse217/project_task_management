@@ -13,3 +13,13 @@ We do this to keep both sides of the relationship updated. This, because the Tas
 
 To keep the relationship updated, we use that method. Socrating hint: 
  When you create your Mapper class to convert a Project (Domain) to a ProjectEntity (JPA), you will loop through the domain tasks and create TaskEntities. During that loop, what explicit method call must you make on every TaskEntity so Hibernate knows which Project it belongs to?
+
+- ## Using Factory methods for reconstitution
+By using them, we can avoid the public setters and have a more meaningful name for reconstituting our models from our entities. The main difference is that setters allow MUTATION (a created object can have its UUID changed in the middle of the process) while Factory methods only allow INSTANTIATION (creates a brand new object using the method, its information is locked forever and information cannot be changed). If a developer called the method, they could create new objects but not change an existing one.
+
+- ## Repository weird implementation (Repository Adapter Pattern)
+I decided that I wanted my service to only deal with domain models so I'm using a custom implementation of my repositories. I have the JPA repository which bring only the entities and another interface for my domain model which I implement and inject the JPA repository to. 
+Our JPA repository is considered the main repository so we might have issues with annotating the implementation with @Repository which is why we use @Component. 
+
+- ## ProjectDomainRepositoryImpl.save retrieves a DB object to later save
+INSERTS in Hibernate are made when the id of the entity passed is null, which is our normal, because we don't set a Long id (db id ) in the domain. This makes that even entities that already exists, will be passed with a null id. To avoid INSERTS and exceptions for the uniqueness of the name, we try to bring the entity by the UUID and check with the optional if it's present: if it is present, we get it out and get its id to set it to the entity to be saved. 

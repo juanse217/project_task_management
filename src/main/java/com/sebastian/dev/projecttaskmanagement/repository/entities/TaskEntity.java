@@ -1,5 +1,6 @@
 package com.sebastian.dev.projecttaskmanagement.repository.entities;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import com.sebastian.dev.projecttaskmanagement.model.Status;
@@ -38,6 +39,8 @@ public class TaskEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING) // save as String.
     private Status status;
+    @Column(nullable = false, name = "finish_date")
+    private LocalDate finishDate;
     @ManyToOne(fetch = FetchType.LAZY) // Child entity (owning side) always with JoinColumn
     @JoinColumn(name = "project_id")
     private ProjectEntity project;
