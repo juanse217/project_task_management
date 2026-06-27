@@ -7,9 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.groups.Default;
 
-public record CreateProjectDTO(
+public record ProjectDTO(
         @JsonProperty(access = JsonProperty.Access.READ_ONLY)
         UUID domainId, //provided by the business domain.
         @NotBlank(message = "The NAME is required to create the project")

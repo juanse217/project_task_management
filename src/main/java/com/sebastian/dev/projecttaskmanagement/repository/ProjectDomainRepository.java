@@ -16,6 +16,6 @@ public interface ProjectDomainRepository {
     Project findProjectByName(String name);
     Slice<Project> findAllProjects(Pageable pageable);
     Project save(Project project);
-    
     void deleteByDomainId(UUID id);
+    boolean existsByName(String name);
 }

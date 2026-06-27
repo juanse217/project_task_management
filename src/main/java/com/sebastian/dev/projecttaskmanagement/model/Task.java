@@ -39,12 +39,12 @@ public class Task {
         return new Task(id, toDo, finishDate, status);
     }
 
-    public void updateToDo(String toDO) {
-        checkNullity(toDO);
-        this.toDo = toDO;
+    public void updateToDo(String toDo) {
+        checkNullity(toDo);
+        this.toDo = toDo;
     }
 
-    public void updatefinishDate(LocalDate finishDate) {
+    public void updateFinishDate(LocalDate finishDate) {
         checkNullity(finishDate);
         this.finishDate = finishDate;
     }

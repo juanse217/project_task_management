@@ -19,4 +19,5 @@ public interface ProjectEntityRepository extends JpaRepository<ProjectEntity, Lo
     Optional<ProjectEntity> findByName(String name);
     Slice<ProjectEntity> findAllBy(Pageable pageable); //Convention to get all from derived query
     void deleteByDomainId(UUID id);
+    boolean existsByName(String name);
 }

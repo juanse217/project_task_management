@@ -22,4 +22,14 @@ I decided that I wanted my service to only deal with domain models so I'm using 
 Our JPA repository is considered the main repository so we might have issues with annotating the implementation with @Repository which is why we use @Component. 
 
 - ## ProjectDomainRepositoryImpl.save retrieves a DB object to later save
-INSERTS in Hibernate are made when the id of the entity passed is null, which is our normal, because we don't set a Long id (db id ) in the domain. This makes that even entities that already exists, will be passed with a null id. To avoid INSERTS and exceptions for the uniqueness of the name, we try to bring the entity by the UUID and check with the optional if it's present: if it is present, we get it out and get its id to set it to the entity to be saved. 
+INSERTS in Hibernate are made when the id of the entity passed is null, which is our normal, because we don't set a Long id (db id ) in the domain. This makes that even entities that already exists, will be passed with a null id. To avoid INSERTS and exceptions for the uniqueness of the name, we try to bring the entity by the UUID and check with the optional if it's present: if it is present, we get it out and get its id to set it to the entity to be saved.
+
+- ## Set<> Persistence
+Since we can't have a list of elements in a relational DB in a cell, we need to create a separate table to hold the user id with its different roles. They're fetched EAGER so the security context can have them at hand everytime a user is loaded.
+- ## Set conversion to array using streams
+ this code: `String[] roles = user.getRoles().stream().toArray(String[]::new);` converts the set to an array. The toArray() takes an IntFunction<R>. Nosotros pasamos String::new porque el stream cuenta los elementos que tiene e inicializa el array con este. Luego llena con los elementos del stream. 
+
+- ## synchronization pattern
+We use this in `ProjectDomainRepositoryImpl.save` to synchronize the collections between our pure domain models and JPA entities. Since the model holds objects that might've changed, we need to ensure that we update our entities as well by companing with what we have in the DB and making the necessary changes (update, insert, delete). 
+ 
+ Since our domain model does not track database primary keys (like Long id), we cannot simply overwrite the database entity with a newly mapped one. Instead, we must compare the domain model's state with the managed database entity and manually apply the necessary changes (update, insert, delete) to the existing JPA collection. This allows us to keep our domain model pure while perfectly leveraging JPA's dirty-checking and preserving database identities.

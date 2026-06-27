@@ -1,15 +1,16 @@
-package com.sebastian.dev.projecttaskmanagement.exception;
+package com.sebastian.dev.projecttaskmanagement.exception.advice;
 
 import com.sebastian.dev.projecttaskmanagement.controller.dto.ErrorResponseDTO;
+import com.sebastian.dev.projecttaskmanagement.exception.BusinessRuleViolationException;
+import com.sebastian.dev.projecttaskmanagement.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestControllerAdvice
@@ -38,7 +39,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ProblemDetail> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        ProblemDetail p = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, "validation failed for one or more fields");
+        ProblemDetail p = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT,
+                "validation failed for one or more fields");
         p.setTitle("Invalid Request Argument");
         List<ErrorResponseDTO> errors = ex.getFieldErrors()
                 .stream()
@@ -62,7 +64,8 @@ public class GlobalExceptionHandler {
         ProblemDetail pm = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
                 "There was an unexpected error, try again later");
         pm.setTitle("Unexpected error");
-        // p.setInstance(URI.create(request.getDescription(false))); Spring automatically sets it
+        // p.setInstance(URI.create(request.getDescription(false))); Spring
+        // automatically sets it
         // p.setProperty("stack_trace", ex.getStackTrace()); logs for us.
         pm.setProperty("Error", ex.getMessage());
 
