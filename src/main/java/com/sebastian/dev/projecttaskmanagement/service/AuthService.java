@@ -1,5 +1,7 @@
 package com.sebastian.dev.projecttaskmanagement.service;
 
+import java.util.Set;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.sebastian.dev.projecttaskmanagement.exception.businessviolation.UsernameAlreadyInUserException;
 import com.sebastian.dev.projecttaskmanagement.repository.UserRepository;
+import com.sebastian.dev.projecttaskmanagement.repository.entities.Role;
 import com.sebastian.dev.projecttaskmanagement.repository.entities.UserEntity;
 import com.sebastian.dev.projecttaskmanagement.security.JwtUtil;
 import com.sebastian.dev.projecttaskmanagement.shared.AuthResponse;
@@ -31,14 +34,16 @@ public class AuthService {
             throw new UsernameAlreadyInUserException("The username " + username + "is already in use");
         }
 
+        Set<Role> roles = Set.of(Role.PROJECT_USER);
+        
         UserEntity user = new UserEntity();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(request.password()));
-        user.setRoles(request.roles());
+        user.setRoles(roles);
 
         userRepository.save(user);
 
-        String token = jwtUtil.generateToken(username, request.roles());
+        String token = jwtUtil.generateToken(username, roles);
 
         return new AuthResponse(token);
     }

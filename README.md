@@ -33,3 +33,21 @@ Since we can't have a list of elements in a relational DB in a cell, we need to 
 We use this in `ProjectDomainRepositoryImpl.save` to synchronize the collections between our pure domain models and JPA entities. Since the model holds objects that might've changed, we need to ensure that we update our entities as well by companing with what we have in the DB and making the necessary changes (update, insert, delete). 
  
  Since our domain model does not track database primary keys (like Long id), we cannot simply overwrite the database entity with a newly mapped one. Instead, we must compare the domain model's state with the managed database entity and manually apply the necessary changes (update, insert, delete) to the existing JPA collection. This allows us to keep our domain model pure while perfectly leveraging JPA's dirty-checking and preserving database identities.
+
+- ## Not allowing users to choose their roles
+In the registerRequestDTO, we removed the option to send in the roles of the user. Instead, we, hardcode the PROJECT_USER role for every request send through registration. 
+To create users with different roles, we have a way: create an admin panel. Here, an Admin can make another user an admin or a project manager. 
+```@PutMapping("/api/v1/users/{username}/roles")
+@PreAuthorize("hasRole('ADMIN')") // CRITICAL: Only an existing Admin can do this
+public ResponseEntity<Void> updateUserRoles(@PathVariable String username, @RequestBody UpdateRolesRequest request) {
+    userService.updateRoles(username, request.roles());
+    return ResponseEntity.ok().build();
+}
+```
+
+*But who will be the patient 0 (the first admin)?*
+For this, we have multiple ways: 
+- DB seeding -> we have a CommandLineRunner or a migration script that runs when the server starts and asks if there's an admin user, if there's not, it'll automatically create it. 
+- Manual DB intervention -> the developer opens the DB manager, connects to the production DB and inserts the admin role into the user_roles table for their account. 
+
+### The admin panel or controller to manage roles won't be done here, there's just the note to know we can create it

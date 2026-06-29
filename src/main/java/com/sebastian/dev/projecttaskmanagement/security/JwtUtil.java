@@ -27,7 +27,7 @@ public class JwtUtil {
 
     public String generateToken(String username, Collection<Role> roles) {
         Map<String, Object> extraClaims = new HashMap<>();
-        List<String> rolesList = roles.stream().map(Role::toString).toList();//convert roles to String.
+        List<String> rolesList = roles.stream().map(role -> role.name()).toList();//convert roles to String.
         extraClaims.put("roles", rolesList);
 
         return buildToken(username, extraClaims);
