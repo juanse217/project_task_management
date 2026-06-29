@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.UUID;
 
-import com.sebastian.dev.projecttaskmanagement.exception.businessviolation.NameAlreadyInUseException;
 import com.sebastian.dev.projecttaskmanagement.exception.businessviolation.ProjectAlreadyContainsTaskException;
 import com.sebastian.dev.projecttaskmanagement.exception.notfound.TaskNotFoundException;
 
@@ -48,14 +47,14 @@ public class Project {
 
     public void addTask(Task task) {
         checkNullity(task);
-        boolean added = this.tasks.add(task);//true if the set didn't contain the task
+        boolean added = this.tasks.add(task);// true if the set didn't contain the task
         if (!added) {
             throw new ProjectAlreadyContainsTaskException(
                     String.format("The project %s already contains task %s", this.name, task.getToDo()));
         }
     }
 
-    public Task updateTask(UUID taskId, String toDo, LocalDate finishDate){
+    public Task updateTask(UUID taskId, String toDo, LocalDate finishDate) {
         Task task = findTask(taskId);
         if (toDo != null)
             task.updateToDo(toDo);
@@ -65,13 +64,13 @@ public class Project {
         return task;
     }
 
-    public Task startTask(UUID taskId){
+    public Task startTask(UUID taskId) {
         Task task = findTask(taskId);
         task.startTask();
         return task;
     }
 
-    public Task finishTask(UUID taskId){
+    public Task finishTask(UUID taskId) {
         Task task = findTask(taskId);
         task.finishTask();
         return task;
@@ -94,7 +93,6 @@ public class Project {
                 .findFirst()
                 .orElseThrow(() -> new TaskNotFoundException(String.format("The task with id %s not found", taskId)));
     }
-
 
     private void checkNullity(Object o) {
         if (o == null) {
